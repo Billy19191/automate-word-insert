@@ -23,7 +23,7 @@ async function generateDocs() {
     let successCount = 0
     let errorCount = 0
 
-    for (const row of worksheet.getRows(2, worksheet.rowCount - 1) || []) {
+    for (const row of worksheet?.getRows(2, worksheet.rowCount - 1) || []) {
       const companyNumber = row.getCell('B').text?.trim() || ''
       const companyInitial = row.getCell('C').text?.trim() || ''
       const companyHeader = row.getCell('A').text?.trim() || ''
@@ -40,13 +40,11 @@ async function generateDocs() {
           linebreaks: true,
         })
 
-        doc.setData({
+        doc.render({
           CompanyNumber: companyNumber,
           CompanyInitial: companyInitial,
           CompanyHeader: companyHeader,
         })
-
-        doc.render()
 
         const docBuffer = doc.getZip().generate({ type: 'nodebuffer' })
         const docxFilename = `${companyNumber}_${companyInitial} Schedule 9_CC.docx`
@@ -54,7 +52,6 @@ async function generateDocs() {
         fs.writeFileSync(docxPath, docBuffer)
 
         try {
-          // Convert to promise-based usage
           const pdfBuffer = await new Promise((resolve, reject) => {
             libre.convert(docBuffer, '.pdf', undefined, (err, data) => {
               if (err) {
