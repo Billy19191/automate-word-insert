@@ -3,26 +3,21 @@ import path from 'path'
 import ExcelJS from 'exceljs'
 import PizZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
-import { execSync } from 'child_process'
+import libre from 'libreoffice-convert'
 
 const templatePath = 'input/template.docx'
 const outputDir = 'output'
 const excelPath = 'input/companyList.xlsx'
 
-// Ensure output directory exists
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir)
 
 async function generateDocs() {
   try {
-    // Read Excel file
     const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.readFile(excelPath)
     const worksheet = workbook.getWorksheet(1)
 
-    // Read template
     const templateContent = fs.readFileSync(templatePath, 'binary')
-
-    testDoc.render()
     console.log('✅ Template is valid')
 
     let successCount = 0
@@ -39,7 +34,6 @@ async function generateDocs() {
       }
 
       try {
-        // Create new document instance for each iteration
         const docZip = new PizZip(templateContent)
         const doc = new Docxtemplater(docZip, {
           paragraphLoop: true,
@@ -54,27 +48,33 @@ async function generateDocs() {
 
         doc.render()
 
-        // Generate DOCX
         const docBuffer = doc.getZip().generate({ type: 'nodebuffer' })
         const docxFilename = `${companyNumber}_${companyInitial} Schedule 9_CC.docx`
         const docxPath = path.join(outputDir, docxFilename)
         fs.writeFileSync(docxPath, docBuffer)
 
-        // Convert to PDF using LibreOffice CLI
         try {
-          execSync(
-            `soffice --headless --convert-to pdf --outdir "${outputDir}" "${docxPath}"`,
-            { timeout: 30000 } // 30 second timeout
-          )
-          console.log(`✅ Generated: ${docxFilename}`)
+          // Convert to promise-based usage
+          const pdfBuffer = await new Promise((resolve, reject) => {
+            libre.convert(docBuffer, '.pdf', undefined, (err, data) => {
+              if (err) {
+                reject(err)
+              } else {
+                resolve(data)
+              }
+            })
+          })
+
+          const pdfFilename = `${companyNumber}_${companyInitial} Schedule 9_CC.pdf`
+          const pdfPath = path.join(outputDir, pdfFilename)
+          fs.writeFileSync(pdfPath, pdfBuffer)
+          console.log(`📄 Generated PDF: ${pdfFilename}`)
           successCount++
         } catch (pdfError) {
           console.error(
-            `❌ PDF conversion failed for ${docxFilename}:`,
+            `❌ PDF conversion failed for ${companyNumber}:`,
             pdfError.message
           )
-          console.log(`📄 DOCX file created successfully: ${docxFilename}`)
-          successCount++
         }
       } catch (renderError) {
         console.error(
