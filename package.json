@@ -1,0 +1,18 @@
+{
+  "name": "NIgga_Ray_Stuff",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.10.0",
+  "dependencies": {
+    "docxtemplater": "^3.63.2",
+    "exceljs": "^4.4.0",
+    "pizzip": "^3.2.0"
+  }
+}
