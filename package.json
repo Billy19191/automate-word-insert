@@ -1,9 +1,11 @@
 {
-  "name": "NIgga_Ray_Stuff",
+  "name": "Automate DOCX Insertion",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "node automate.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
