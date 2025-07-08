@@ -27,8 +27,10 @@ async function generateDocs() {
       const companyNumber = row.getCell('B').text?.trim() || ''
       const companyInitial = row.getCell('C').text?.trim() || ''
       const companyHeader = row.getCell('A').text?.trim() || ''
+      const dueDate = row.getCell('D').text?.trim() || ''
+      const address = row.getCell('E').text?.trim() || ''
 
-      if (!companyNumber || !companyInitial || !companyHeader) {
+      if (!companyNumber || !companyInitial || !companyHeader || !dueDate || !address) {
         console.log(`⚠️  Skipping row with missing data: ${companyNumber}`)
         continue
       }
@@ -44,6 +46,8 @@ async function generateDocs() {
           CompanyNumber: companyNumber,
           CompanyInitial: companyInitial,
           CompanyHeader: companyHeader,
+          DueDate: dueDate,
+          Address: address
         })
 
         const docBuffer = doc.getZip().generate({ type: 'nodebuffer' })
